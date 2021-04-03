@@ -16,8 +16,6 @@ on:
         default: 'The Octoverse'
 jobs:
   buildimg:
-    env:
-      SOURCE_CMD: git clone -b openwrt-19.07 https://git.openwrt.org/openwrt/openwrt.git
     name: Build Openwrt Image
     runs-on: ubuntu-20.04
     strategy:
