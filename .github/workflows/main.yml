@@ -44,4 +44,5 @@ jobs:
         env:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
         run: |
+          echo $PROFILE_VERSION
           git clone -b $PROFILE_VERSION https://git.openwrt.org/openwrt/openwrt.git
