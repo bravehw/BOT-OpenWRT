@@ -1,19 +1,19 @@
 name: Openwrt Build Bot
 on:
-  #push:
-  #  branches: main
-  #schedule:
-  #- cron: 0 0 * * 1
+  push:
+    branches: main
+  schedule:
+    - cron: 0 0 * * 1
   workflow_dispatch:
     inputs:
       name:
         description: 'Person to greet'
         required: true
         default: 'Mona the Octocat'
-      home:
-        description: 'location'
-        required: false
-        default: 'The Octoverse'
+    home:
+      description: 'location'
+      required: false
+      default: 'The Octoverse'
 jobs:
   buildimg:
     name: Build Openwrt Image
@@ -39,27 +39,3 @@ jobs:
           sudo -E apt-get update
           sudo apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev
           sudo -E apt-get clean
-      - name: Initiate OpenWRT git source
-        env:
-          PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
-        run: |
-          git clone -b $PROFILE_VERSION https://git.openwrt.org/openwrt/openwrt.git
-      - name: Initiate configuration file
-        env:
-          PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
-          CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
-        run: |
-          cd openwrt
-          ./scripts/feeds update -a
-          ./scripts/feeds install -a
-          rm -f ./.config*
-          wget $CONFIG_BUILDINFO -O ./.config
-          cat >> ./.config <<EOF
-          CONFIG_PACKAGE_luci-app-vlmcsd=y
-          CONFIG_PACKAGE_luci-app-ddns=y
-          CONFIG_PACKAGE_luci-app-upnp=y
-          CONFIG_PACKAGE_luci-ssl=y
-          CONFIG_PACKAGE_vlmcsd=y
-          EOF
-          sed -i 's/^[ \t]*//g' ./.config
-          cat ./.config
