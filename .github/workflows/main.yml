@@ -42,10 +42,13 @@ jobs:
       - name: Initiate OpenWRT git source
         env:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
-          CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
         run: |
           git clone -b $PROFILE_VERSION https://git.openwrt.org/openwrt/openwrt.git
       - name: Initiate configuration file
+        env:
+          PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
+          CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
+        run: |
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
