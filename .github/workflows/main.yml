@@ -45,12 +45,19 @@ jobs:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
         run: |
           git clone -b $PROFILE_VERSION https://git.openwrt.org/openwrt/openwrt.git
+      - name: Sync addon package
+        run: |
+          pwd
+          # Vlmcsd
+          git clone -b master https://github.com/mchome/openwrt-vlmcsd openwrt/package/vlmcsd
+          git clone -b master https://github.com/mchome/luci-app-vlmcsd openwrt/package/luci-app-vlmcsd
       - name: Initiate configuration file
         env:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
           CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
         run: |
           cd openwrt
+          make distclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           rm -f ./.config*
@@ -64,3 +71,13 @@ jobs:
           EOF
           sed -i 's/^[ \t]*//g' ./.config
           cat ./.config
+          make toolchain/install
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+          echo "============================================="
+          find ./ -name "*factory*"
+          echo "============================================="
+          find ./ -name "*sysupgrade*"
