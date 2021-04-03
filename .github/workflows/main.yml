@@ -60,24 +60,27 @@ jobs:
           make distclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          rm -f ./.config*
-          wget $CONFIG_BUILDINFO -O ./.config
+          #rm -f ./.config*
+          #wget $CONFIG_BUILDINFO -O ./.config
           cat >> ./.config <<EOF
-          CONFIG_PACKAGE_luci-app-vlmcsd=y
-          CONFIG_PACKAGE_luci-app-ddns=y
-          CONFIG_PACKAGE_luci-app-upnp=y
-          CONFIG_PACKAGE_luci-ssl=y
+          #CONFIG_PACKAGE_luci-app-vlmcsd=y
+          #CONFIG_PACKAGE_luci-app-ddns=y
+          #CONFIG_PACKAGE_luci-app-upnp=y
+          #CONFIG_PACKAGE_luci-ssl=y
           CONFIG_PACKAGE_vlmcsd=y
+          CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
           sed -i 's/^[ \t]*//g' ./.config
           cat ./.config
-          make toolchain/install
+          #make toolchain/install
           #make download -j8
           #find dl -size -1024c -exec ls -l {} \;
           #find dl -size -1024c -exec rm -f {} \;
           #echo -e "$(nproc) thread build."
           #make -j$(nproc) V=s
           echo "============================================="
+          make package/vlmcsd/compile V=s -j$(nproc)
           #find ./ -name "*factory*"
           echo "============================================="
           #find ./ -name "*sysupgrade*"
+          #find ./ -name "*.ipk"
