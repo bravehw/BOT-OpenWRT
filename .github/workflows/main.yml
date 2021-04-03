@@ -1,0 +1,39 @@
+name: Openwrt Build Bot
+on:
+  #push:
+  #  branches: main
+  #schedule:
+  #- cron: 0 0 * * 1
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Person to greet'
+        required: true
+        default: 'Mona the Octocat'
+      home:
+        description: 'location'
+        required: false
+        default: 'The Octoverse'
+jobs:
+  buildimg:
+    name: Build Openwrt Image
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        # netgear_r7800
+        - PROFILE_TARGET: ipq806x/generic
+          PROFILE_TAG: netgear_r7800
+          IB_URL: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/openwrt-imagebuilder-19.07.7-ipq806x-generic.Linux-x86_64.tar.xz
+          SDK_URL: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/openwrt-sdk-19.07.7-ipq806x-generic_gcc-7.5.0_musl_eabi.Linux-x86_64.tar.xz
+          MANIFEST_URL: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/openwrt-19.07.7-ipq806x-generic.manifest
+          PACKAGES: luci luci-ssl luci-app-ddns luci-app-upnp
+          INCLUDE_FILES: true
+        - PROFILE_TARGET: x86/64
+          PROFILE_TAG: Generic
+          IB_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-imagebuilder-19.07.7-x86-64.Linux-x86_64.tar.xz
+          SDK_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-sdk-19.07.7-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
+          MANIFEST_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-19.07.7-x86-64-generic.manifest
+          PACKAGES: luci luci-ssl luci-app-ddns luci-app-upnp
+          INCLUDE_FILES: true
