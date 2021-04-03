@@ -33,3 +33,63 @@ jobs:
           MANIFEST_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-19.07.7-x86-64-generic.manifest
           PACKAGES: luci-ssl luci-app-ddns luci-app-upnp
           INCLUDE_FILES: true
+    steps:
+    - uses: actions/checkout@master
+    - name: Env for Openwrt ImageBuilder
+      run: |
+        #sudo apt install -y libncurses-dev
+        #sudo apt install -y build-essential libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync wget unzip python
+        sudo apt update
+        sudo apt-get install build-essential subversion libncurses5-dev zlib1g-dev
+        sudo apt-get install gawk gcc-multilib flex git-core gettext libssl-dev
+        sudo apt-get install python3-distutils
+        sudo apt-get dist-upgrade
+    - name: Download Openwrt ImageBuilder
+      env:
+        IB_URL: ${{ matrix.IB_URL }}
+      run: |
+        wget $IB_URL
+        tar xf $(basename $IB_URL)
+    - name: Download Openwrt SDK
+      env:
+        SDK_URL: ${{ matrix.SDK_URL }}
+      run: |
+        wget $SDK_URL
+        tar xf $(basename $SDK_URL)
+    - name: Fetch additional package
+      env:
+        IB_URL: ${{ matrix.IB_URL }}
+        SDK_URL: ${{ matrix.SDK_URL }}
+      #if: matrix.INCLUDE_FILES
+      run: |
+        SDK_HOME=$(basename $SDK_URL|head -c -8)
+        git clone -b master https://github.com/mchome/openwrt-vlmcsd $SDK_HOME/package/vlmcsd
+        git clone -b master https://github.com/mchome/luci-app-vlmcsd $SDK_HOME/package/luci-app-vlmcsd
+    - name: complie ImageBuilder
+      env:
+        IB_URL: ${{ matrix.IB_URL }}
+        MANIFEST_URL: ${{ matrix.MANIFEST_URL }}
+        PROFILE_TAG: ${{ matrix.PROFILE_TAG }}
+        PACKAGES: ${{ matrix.PACKAGES }}
+      run: |
+        IB_HOME=$(basename $IB_URL|head -c -8)
+        echo $IB_HOME
+        cd $IB_HOME
+        wget $MANIFEST_URL
+        MANIFEST_VAL=`cat $(basename $MANIFEST_URL)`
+        echo "=====================MANIFEST ORG========================"
+        echo $MANIFEST_VAL
+        echo "=====================MANIFEST AFTER========================"
+        MANIFEST_VAL=`sed -e 's/ .*$//g' $(basename $MANIFEST_URL)`
+        MANIFEST_VAL=`echo $MANIFEST_VAL | tr -t '\n' ' '`
+        echo $MANIFEST_VAL
+        echo "========================================"
+        make info
+        echo "========================================"
+        make image PROFILE=$PROFILE_TAG PACKAGES="$MANIFEST_VAL $PACKAGES"
+        echo "========================================"
+        pwd
+        find ./$IB_URL -name "*combined*img*"
+        #| xargs -i mv -f {} ~/artifact/
+        find ./$IB_URL -name "*sysupgrade*bin*"
+        #| xargs -i mv -f {} ~/artifact/
