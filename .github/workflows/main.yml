@@ -38,4 +38,10 @@ jobs:
         run: |
           sudo -E apt-get update
           sudo apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev
+          sudo -E apt-get -y dist-update
           sudo -E apt-get clean
+      - name: Initiate OpenWRT git source
+        env:
+          PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
+        run: |
+          git clone -b $PROFILE_VERSION https://git.openwrt.org/openwrt/openwrt.git
