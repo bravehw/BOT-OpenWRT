@@ -37,12 +37,30 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo -E apt-get update
-          sudo apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev
+          sudo -E apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev
           sudo -E apt-get -y dist-upgrade
           sudo -E apt-get clean
       - name: Initiate OpenWRT git source
         env:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
         run: |
-          echo $PROFILE_VERSION
           git clone -b $PROFILE_VERSION https://git.openwrt.org/openwrt/openwrt.git
+      - name: Initiate configuration file
+        env:
+          PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
+          CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
+        run: |
+          cd openwrt
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          rm -f ./.config*
+          wget $CONFIG_BUILDINFO -O ./.config
+          cat >> ./.config <<EOF
+          CONFIG_PACKAGE_luci-app-vlmcsd=y
+          CONFIG_PACKAGE_luci-app-ddns=y
+          CONFIG_PACKAGE_luci-app-upnp=y
+          CONFIG_PACKAGE_luci-ssl=y
+          CONFIG_PACKAGE_vlmcsd=y
+          EOF
+          sed -i 's/^[ \t]*//g' ./.config
+          cat ./.config
