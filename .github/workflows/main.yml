@@ -71,6 +71,7 @@ jobs:
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
           sed -i 's/^[ \t]*//g' ./.config
+          make defconfig
           cat ./.config
           #make toolchain/install
           #make download -j8
