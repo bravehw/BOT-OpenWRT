@@ -26,8 +26,6 @@ jobs:
           PROFILE_VERSION: openwrt-19.07
           CONFIG_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
           FEEDS_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/feeds.buildinfo
-          IB_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-imagebuilder-19.07.7-x86-64.Linux-x86_64.tar.xz
-          SDK_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-sdk-19.07.7-x86-64_gcc-7.5.0_musl.Linux-x86_64.tar.xz
           MANIFEST_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-19.07.7-x86-64-generic.manifest
           PACKAGES: luci-ssl luci-app-ddns luci-app-upnp
           INCLUDE_FILES: true
@@ -60,20 +58,21 @@ jobs:
           make distclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-          #rm -f ./.config*
-          #wget $CONFIG_BUILDINFO -O ./.config
+          rm -f ./.config*
+          wget $CONFIG_BUILDINFO -O ../.config
+          cp ../.config ./.config
+          make defconfig
+          cat ../.config >> ./.config
           cat >> ./.config <<EOF
-          #CONFIG_PACKAGE_luci-app-vlmcsd=y
-          #CONFIG_PACKAGE_luci-app-ddns=y
-          #CONFIG_PACKAGE_luci-app-upnp=y
-          #CONFIG_PACKAGE_luci-ssl=y
-          CONFIG_PACKAGE_vlmcsd=y
+          CONFIG_PACKAGE_luci-app-vlmcsd=y
+          CONFIG_PACKAGE_luci-app-ddns=y
+          CONFIG_PACKAGE_luci-app-upnp=y
+          CONFIG_PACKAGE_luci-ssl=y
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
           cat ./.config
-          #make toolchain/install
           make download -j8
           #find dl -size -1024c -exec ls -l {} \;
           #find dl -size -1024c -exec rm -f {} \;
@@ -84,4 +83,3 @@ jobs:
           find ./ -name "*factory*"
           echo "============================================="
           find ./ -name "*sysupgrade*"
-          find ./ -name "*.ipk"
