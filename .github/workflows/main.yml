@@ -53,6 +53,7 @@ jobs:
         env:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
           CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
+          REMOVE_TAG: ${{ matrix.REMOVE_TAG }}
         run: |
           cd openwrt
           make distclean
@@ -61,8 +62,9 @@ jobs:
           rm -f ./.config*
           wget $CONFIG_BUILDINFO -O ../.config
           cp ../.config ./.config
-          make defconfig
-          cat ../.config >> ./.config
+          #make defconfig
+          #sed -i '/=yes/d' ../.config
+          #cat ../.config >> ./.config
           cat >> ./.config <<EOF
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           CONFIG_PACKAGE_luci-app-ddns=y
@@ -71,7 +73,7 @@ jobs:
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
           sed -i 's/^[ \t]*//g' ./.config
-          make defconfig
+          #make defconfig
           cat ./.config
           make download -j8
           #find dl -size -1024c -exec ls -l {} \;
