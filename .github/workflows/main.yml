@@ -26,7 +26,7 @@ jobs:
           PROFILE_VERSION: openwrt-19.07
           CONFIG_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
           FEEDS_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/feeds.buildinfo
-          MANIFEST_URL: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/openwrt-19.07.7-x86-64-generic.manifest
+          REMOVE_TAG: x86
           PACKAGES: luci-ssl luci-app-ddns luci-app-upnp
           INCLUDE_FILES: true
     steps:
@@ -52,16 +52,18 @@ jobs:
       - name: Initiate configuration file
         env:
           CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
+          REMOVE_TAG: ${{ matrix.REMOVE_TAG }}
         run: |
           cd openwrt
           make distclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           rm -f ./.config*
-          wget $CONFIG_BUILDINFO -O ./.config
-          #make defconfig
-          #sed -i '/=yes/d' ../.config
-          #cat ../.config >> ./.config
+          wget $CONFIG_BUILDINFO -O ../.config
+          cp ../.config ./.config
+          make defconfig
+          sed -i "/=$REMOVE_TAG/d" ../.config
+          cat ../.config >> ./.config
           cat ./.config
       - name: Add additional package to configuration file
         run: |
