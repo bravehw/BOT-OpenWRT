@@ -51,20 +51,21 @@ jobs:
           git clone -b master https://github.com/mchome/luci-app-vlmcsd openwrt/package/luci-app-vlmcsd
       - name: Initiate configuration file
         env:
-          PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
           CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
-          REMOVE_TAG: ${{ matrix.REMOVE_TAG }}
         run: |
           cd openwrt
           make distclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           rm -f ./.config*
-          wget $CONFIG_BUILDINFO -O ../.config
-          cp ../.config ./.config
+          wget $CONFIG_BUILDINFO -O ./.config
           #make defconfig
           #sed -i '/=yes/d' ../.config
           #cat ../.config >> ./.config
+          cat ./.config
+      - name: Add additional package to configuration file
+        run: |
+          cd openwrt
           cat >> ./.config <<EOF
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           CONFIG_PACKAGE_luci-app-ddns=y
@@ -72,9 +73,12 @@ jobs:
           CONFIG_PACKAGE_luci-ssl=y
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
+          cat ./.config
+      - name: Complie firmware
+        run: |
+          cd openwrt
           sed -i 's/^[ \t]*//g' ./.config
           #make defconfig
-          cat ./.config
           make download -j8
           #find dl -size -1024c -exec ls -l {} \;
           #find dl -size -1024c -exec rm -f {} \;
