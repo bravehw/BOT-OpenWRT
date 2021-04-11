@@ -55,16 +55,14 @@ jobs:
           REMOVE_TAG: ${{ matrix.REMOVE_TAG }}
         run: |
           cd openwrt
-          make distclean
+          make dirclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
           rm -f ./.config*
           wget $CONFIG_BUILDINFO -O ../.config
           cp ../.config ./.config
           make defconfig
-          sed -i "/=$REMOVE_TAG/d" ../.config
-          cat ../.config >> ./.config
-          cat ./.config
+          #sed -i "/=$REMOVE_TAG/d" ../.config
       - name: Add additional package to configuration file
         run: |
           cd openwrt
@@ -75,13 +73,15 @@ jobs:
           CONFIG_PACKAGE_luci-ssl=y
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
+          sed -i 's/^[ \t]*//g' ./.config
+          make defconfig
+          echo "================================================"
           cat ./.config
+          echo "================================================"
       - name: Complie firmware
         run: |
           cd openwrt
-          sed -i 's/^[ \t]*//g' ./.config
-          #make defconfig
-          #make download -j8
+          make download -j8
           #find dl -size -1024c -exec ls -l {} \;
           #find dl -size -1024c -exec rm -f {} \;
           echo -e "$(nproc) thread build."
