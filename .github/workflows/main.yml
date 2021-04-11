@@ -22,23 +22,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - PROFILE_TARGET: x86/64
+        - PROFILE_TARGET: ipq806x
           PROFILE_VERSION: openwrt-19.07
-          CONFIG_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
-          FEEDS_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/feeds.buildinfo
-          REMOVE_TAG: x86
-          PACKAGES: luci-ssl luci-app-ddns luci-app-upnp
-          INCLUDE_FILES: true
+          CONFIG_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
+          FEEDS_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/feeds.buildinfo
     steps:
       - name: Initialization environment
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo -E apt-get update
-          sudo -E apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev build-essential ccache ecj fastjar file g++ gawk gettext git java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget python3-distutils python3-setuptools rsync subversion swig time xsltproc zlib1g-dev
+          sudo -E apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev build-essential ccache ecj fastjar file g++ gawk gettext git java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev python2 python3 unzip wget python3-distutils python3-setuptools rsync subversion swig time xsltproc zlib1g-dev
           sudo -E apt-get -y dist-upgrade
           sudo -E apt-get clean
-      - name: Initiate OpenWRT git source
+      - name: Sync OpenWRT git source
         env:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
         run: |
@@ -49,15 +46,17 @@ jobs:
           # Vlmcsd
           git clone -b master https://github.com/mchome/openwrt-vlmcsd openwrt/package/vlmcsd
           git clone -b master https://github.com/mchome/luci-app-vlmcsd openwrt/package/luci-app-vlmcsd
-      - name: Initiate configuration file
-        env:
-          CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
-          REMOVE_TAG: ${{ matrix.REMOVE_TAG }}
+      - name: Update feeds
         run: |
           cd openwrt
           make dirclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+      - name: Initiate configuration file
+        env:
+          CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
+        run: |
+          cd openwrt
           rm -f ./.config*
           wget $CONFIG_BUILDINFO -O ../.config
           cp ../.config ./.config
