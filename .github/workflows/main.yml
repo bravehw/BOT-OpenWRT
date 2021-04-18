@@ -10,10 +10,10 @@ on:
         description: 'Person to greet'
         required: true
         default: 'Mona the Octocat'
-    home:
-      description: 'location'
-      required: false
-      default: 'The Octoverse'
+      home:
+        description: 'location'
+        required: false
+        default: 'The Octoverse'
 jobs:
   buildimg:
     name: Build Openwrt Image
@@ -49,7 +49,7 @@ jobs:
       - name: Update feeds
         run: |
           cd openwrt
-          make dirclean
+          #make dirclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
       - name: Initiate configuration file
@@ -60,8 +60,8 @@ jobs:
           rm -f ./.config*
           wget $CONFIG_BUILDINFO -O ../.config
           cp ../.config ./.config
+          sed -i 's/^[ \t]*//g' ./.config
           make defconfig
-          #sed -i "/=$REMOVE_TAG/d" ../.config
       - name: Add additional package to configuration file
         run: |
           cd openwrt
@@ -73,7 +73,7 @@ jobs:
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
           sed -i 's/^[ \t]*//g' ./.config
-          make defconfig
+          #make defconfig
           echo "================================================"
           cat ./.config
           echo "================================================"
