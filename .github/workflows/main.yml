@@ -92,3 +92,26 @@ jobs:
           find ./ -name "*factory*"
           echo "============================================="
           find ./ -name "*sysupgrade*"
+      - name: Collect firmware
+        run: |
+          mkdir ~/artifact
+          # find ./openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ~/artifact/
+          # find ./openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ~/artifact/
+          find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
+          find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
+          # cd ~/artifact/
+          # for i in `ls`; do mv $i ${CDATE}_$i; done
+          # pwd
+          # ls
+      - name: Rclone Install & Config
+        run: |
+          curl https://rclone.org/install.sh | sudo bash
+          mkdir -p ~/.config/rclone/
+          cat >  ~/.config/rclone/rclone.conf  << EOF
+          ${{ secrets.RCLONE_CONF }}
+          EOF
+      - name: Rclone Sync
+        run: |
+          export CDATE=`date '+%Y%m%d%H%M%S'`
+          rclone mkdir TeraCLOUD:/OpenWRT/${CDATE}
+          rclone copy ~/artifact TeraCLOUD:/OpenWRT/${CDATE}
