@@ -5,15 +5,7 @@ on:
   schedule:
     - cron: 0 0 * * *
   workflow_dispatch:
-    inputs:
-      name:
-        description: 'Person to greet'
-        required: true
-        default: 'Mona the Octocat'
-      home:
-        description: 'location'
-        required: false
-        default: 'The Octoverse'
+
 jobs:
   buildimg:
     name: Build Openwrt Image
@@ -37,23 +29,26 @@ jobs:
           sudo -E apt install -y ccache gawk git libev-dev libc-ares-dev libudns-dev libncurses-dev
           sudo -E apt-get -y dist-upgrade
           sudo -E apt-get clean
+          
       - name: Sync OpenWRT git source
         env:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
         run: |
           git clone -b $PROFILE_VERSION https://git.openwrt.org/openwrt/openwrt.git
+          
       - name: Sync addon package
         run: |
           pwd
           # Vlmcsd
           git clone -b master https://github.com/mchome/openwrt-vlmcsd openwrt/package/vlmcsd
           git clone -b master https://github.com/mchome/luci-app-vlmcsd openwrt/package/luci-app-vlmcsd
+          
       - name: Update feeds
         run: |
           cd openwrt
-          #make dirclean
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          
       - name: Initiate configuration file
         env:
           CONFIG_BUILDINFO: ${{ matrix.CONFIG_BUILDINFO }}
@@ -64,6 +59,10 @@ jobs:
           cp ../.config ./.config
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
+          echo "============BEFORE==============="
+          cat ./.config
+          echo "================================="
+          
       - name: Add additional package to configuration file
         run: |
           cd openwrt
@@ -75,10 +74,10 @@ jobs:
           CONFIG_PACKAGE_luci-app-vlmcsd=y
           EOF
           sed -i 's/^[ \t]*//g' ./.config
-          #make defconfig
-          echo "================================================"
+          make defconfig
+          echo "============AFTER==============="
           cat ./.config
-          echo "================================================"
+          echo "================================"
       - name: Complie firmware
         run: |
           cd openwrt
