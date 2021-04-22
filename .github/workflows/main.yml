@@ -96,10 +96,10 @@ jobs:
           mkdir ~/artifact
           find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
           find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
+          cp ./openwrt/.config ~/artifact/
 
       - name: Rclone Sync
         run: |
           export CDATE=`date '+%Y%m%d%H%M%S'`
           rclone mkdir TeraCLOUD:/OpenWRT/${CDATE}
           rclone copy ~/artifact TeraCLOUD:/OpenWRT/${CDATE}
-          rclone copy ~/openwrt/.config TeraCLOUD:/OpenWRT/${CDATE}
