@@ -1,7 +1,7 @@
 name: Openwrt Build Bot
 on:
-  push:
-    branches: main
+  #push:
+  #  branches: main
   schedule:
     - cron: 0 0 * * *
   workflow_dispatch:
@@ -15,10 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - PROFILE_TARGET: ipq806x
-          PROFILE_VERSION: openwrt-19.07
-          CONFIG_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
-          FEEDS_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/feeds.buildinfo
+        - PROFILE_VERSION: openwrt-19.07
+          #CONFIG_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
+          #FEEDS_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/feeds.buildinfo
           DEFINE_STR: CONFIG_TARGET_ipq806x=y,CONFIG_TARGET_ipq806x_generic=y,CONFIG_TARGET_MULTI_PROFILE=y,CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y
     steps:
       - name: Initialization environment
@@ -30,6 +29,7 @@ jobs:
           sudo -E apt install -y ccache gawk git libev-dev libc-ares-dev libudns-dev libncurses-dev
           sudo -E apt-get -y dist-upgrade
           sudo -E apt-get clean
+          
       - name: Rclone Install & Config
         run: |
           curl https://rclone.org/install.sh | sudo bash
@@ -63,8 +63,6 @@ jobs:
         run: |
           cd openwrt
           rm -f ./.config*
-          #wget $CONFIG_BUILDINFO -O ../.config
-          #cp ../.config ./.config
           define_arry=(${DEFINE_STR//,/ })
           for var in ${define_arry[@]}
           do
@@ -72,10 +70,6 @@ jobs:
           done
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
-          echo "============BEFORE==============="
-          cat ./.config
-          echo "================================="
-          rclone copy ./.config TeraCLOUD:/OpenWRT/config.old
           
       - name: Add additional package to configuration file
         run: |
@@ -89,39 +83,23 @@ jobs:
           EOF
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
-          echo "============AFTER==============="
-          cat ./.config
-          echo "================================"
-          rclone copy ./.config TeraCLOUD:/OpenWRT/config.new
           
       - name: Complie firmware
         run: |
           cd openwrt
           make download -j8
-          #find dl -size -1024c -exec ls -l {} \;
-          #find dl -size -1024c -exec rm -f {} \;
           echo -e "$(nproc) thread build."
           make -j$(nproc) V=s
-          echo "============================================="
-          #make package/vlmcsd/compile V=s -j$(nproc)
-          find ./ -name "*factory*"
-          echo "============================================="
-          find ./ -name "*sysupgrade*"
           
       - name: Collect firmware
         run: |
           mkdir ~/artifact
-          # find ./openwrt/bin/targets/ -name "*combined*img*" | xargs -i mv -f {} ~/artifact/
-          # find ./openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ~/artifact/
           find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
           find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
-          # cd ~/artifact/
-          # for i in `ls`; do mv $i ${CDATE}_$i; done
-          # pwd
-          # ls
 
       - name: Rclone Sync
         run: |
           export CDATE=`date '+%Y%m%d%H%M%S'`
           rclone mkdir TeraCLOUD:/OpenWRT/${CDATE}
           rclone copy ~/artifact TeraCLOUD:/OpenWRT/${CDATE}
+          rclone copy ~/openwrt/.config TeraCLOUD:/OpenWRT/${CDATE}
