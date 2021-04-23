@@ -2,8 +2,8 @@ name: Openwrt Build Bot
 on:
   #push:
   #  branches: main
-  schedule:
-    - cron: 0 0 * * *
+  #schedule:
+  #  - cron: 0 0 * * *
   workflow_dispatch:
 
 jobs:
@@ -15,9 +15,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - PROFILE_VERSION: openwrt-19.07
-          #CONFIG_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
-          #FEEDS_BUILDINFO: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/feeds.buildinfo
+        - PROFILE_TAG: ipq806x
+          PROFILE_VERSION: openwrt-19.07
           DEFINE_STR: CONFIG_TARGET_ipq806x=y,CONFIG_TARGET_ipq806x_generic=y,CONFIG_TARGET_MULTI_PROFILE=y,CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y
     steps:
       - name: Initialization environment
@@ -99,7 +98,9 @@ jobs:
           cp ./openwrt/.config ~/artifact/
 
       - name: Rclone Sync
+        env:
+          PROFILE_TAG: ${{ matrix.PROFILE_TAG }}
         run: |
           export CDATE=`date '+%Y%m%d%H%M%S'`
-          rclone mkdir TeraCLOUD:/OpenWRT/${CDATE}
-          rclone copy ~/artifact TeraCLOUD:/OpenWRT/${CDATE}
+          #rclone mkdir TeraCLOUD:/OpenWRT/${CDATE}
+          rclone copy ~/artifact TeraCLOUD:/OpenWRT/${CDATE}/${PROFILE_TAG}
