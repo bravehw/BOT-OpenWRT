@@ -9,7 +9,6 @@ on:
 jobs:
   buildimg:
     name: Build Openwrt Image
-    #runs-on: ubuntu-20.04
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -17,7 +16,12 @@ jobs:
         include:
         - PROFILE_TAG: ipq806x
           PROFILE_VERSION: openwrt-19.07
-          DEFINE_STR: CONFIG_TARGET_ipq806x=y,CONFIG_TARGET_ipq806x_generic=y,CONFIG_TARGET_MULTI_PROFILE=y,CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y
+          DEFINE_TAG: CONFIG_TARGET_ipq806x=y,CONFIG_TARGET_ipq806x_generic=y,CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y,CONFIG_TARGET_MULTI_PROFILE=y
+          COLLECT_TAG: -name '*factory*' -o -name '*sysupgrade*'
+        - PROFILE_TAG: x86_64
+          PROFILE_VERSION: openwrt-19.07
+          DEFINE_TAG: CONFIG_TARGET_x86=y,CONFIG_TARGET_x86_64=y,CONFIG_TARGET_x86_64_Generic=y,CONFIG_TARGET_MULTI_PROFILE=y
+          COLLECT_TAG: -name 'combined-ext4.img.gz' -o -name 'combined-squashfs.img.gz'
     steps:
       - name: Initialization environment
         env:
@@ -25,7 +29,7 @@ jobs:
         run: |
           sudo -E apt-get update
           #sudo -E apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev build-essential ccache ecj fastjar file g++ gawk gettext git java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev python2 python3 unzip wget python3-distutils python3-setuptools rsync subversion swig time xsltproc zlib1g-dev
-          sudo -E apt install -y ccache gawk git libev-dev libc-ares-dev libudns-dev libncurses-dev
+          sudo -E apt install -y ccache gawk git libev-dev libc-ares-dev libudns-dev libncurses-dev python2 python3
           sudo -E apt-get -y dist-upgrade
           sudo -E apt-get clean
           
@@ -58,11 +62,11 @@ jobs:
           
       - name: Initiate configuration file
         env:
-          DEFINE_STR: ${{ matrix.DEFINE_STR }}
+          DEFINE_TAG: ${{ matrix.DEFINE_TAG }}
         run: |
           cd openwrt
           rm -f ./.config*
-          define_arry=(${DEFINE_STR//,/ })
+          define_arry=(${DEFINE_TAG//,/ })
           for var in ${define_arry[@]}
           do
             echo $var >> ./.config
@@ -91,10 +95,15 @@ jobs:
           make -j$(nproc) V=s
           
       - name: Collect firmware
+        env:
+          COLLECT_TAG: ${{ matrix.COLLECT_TAG }}
         run: |
           mkdir ~/artifact
-          find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
-          find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
+          cmd_str="find ./openwrt/bin/targets/ ${COLLECT_TAG} | xargs -i mv -f {} ~/artifact/"
+          echo ${cmd_str}
+          echo `${cmd_str}`
+          #find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
+          #find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
           cp ./openwrt/.config ~/artifact/
 
       - name: Rclone Sync
