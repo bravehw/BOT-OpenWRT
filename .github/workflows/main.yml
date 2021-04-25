@@ -110,6 +110,7 @@ jobs:
         env:
           PROFILE_TAG: ${{ matrix.PROFILE_TAG }}
         run: |
-          export CDATE=`date '+%Y%m%d%H%M%S'`
+          export CDATE=`date '+%Y%m%d'`
+          #export CDATE=`date '+%Y%m%d%H%M%S'`
           #rclone mkdir TeraCLOUD:/OpenWRT/${CDATE}
           rclone copy ~/artifact TeraCLOUD:/OpenWRT/${CDATE}/${PROFILE_TAG}
