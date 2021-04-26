@@ -14,14 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - PROFILE_TAG: ipq806x
-          PROFILE_VERSION: openwrt-19.07
-          DEFINE_TAG: CONFIG_TARGET_ipq806x=y,CONFIG_TARGET_ipq806x_generic=y,CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y,CONFIG_TARGET_MULTI_PROFILE=y
-          COLLECT_TAG: -name '*factory*' -o -name '*sysupgrade*'
         - PROFILE_TAG: x86_64
           PROFILE_VERSION: openwrt-19.07
-          DEFINE_TAG: CONFIG_TARGET_x86=y,CONFIG_TARGET_x86_64=y,CONFIG_TARGET_x86_64_Generic=y,CONFIG_TARGET_MULTI_PROFILE=y
-          COLLECT_TAG: -name 'combined-ext4.img.gz' -o -name 'combined-squashfs.img.gz'
+          DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
+          COLLECT_TAG: -name 'combined.img.gz' -o -name 'combined-squashfs.img.gz'
+        - PROFILE_TAG: ipq806x
+          PROFILE_VERSION: openwrt-19.07
+          DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
+          COLLECT_TAG: -name '*factory*' -o -name '*sysupgrade*'
+        
     steps:
       - name: Initialization environment
         env:
@@ -62,15 +63,16 @@ jobs:
           
       - name: Initiate configuration file
         env:
-          DEFINE_TAG: ${{ matrix.DEFINE_TAG }}
+          DEFAULT_PROFILE: ${{ matrix.DEFAULT_PROFILE }}
         run: |
           cd openwrt
-          rm -f ./.config*
-          define_arry=(${DEFINE_TAG//,/ })
-          for var in ${define_arry[@]}
-          do
-            echo $var >> ./.config
-          done
+          wget ${DEFAULT_PROFILE} -O .config
+          #rm -f ./.config*
+          #define_arry=(${DEFINE_TAG//,/ })
+          #for var in ${define_arry[@]}
+          #do
+          #  echo $var >> ./.config
+          #done
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
           
