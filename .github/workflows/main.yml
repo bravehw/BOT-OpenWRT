@@ -17,11 +17,11 @@ jobs:
         - PROFILE_TAG: x86_64
           PROFILE_VERSION: openwrt-19.07
           DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
-          COLLECT_TAG: -name 'combined.img.gz' -o -name 'combined-squashfs.img.gz'
+          COLLECT_TAG: ('-name' 'openwrt-x86-64*-combined.img.gz')
         - PROFILE_TAG: ipq806x
           PROFILE_VERSION: openwrt-19.07
           DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
-          COLLECT_TAG: -name '*factory*' -o -name '*sysupgrade*'
+          COLLECT_TAG: ('-name' '*factory*' '-o' '-name' '*sysupgrade*')
         
     steps:
       - name: Initialization environment
@@ -101,9 +101,10 @@ jobs:
           COLLECT_TAG: ${{ matrix.COLLECT_TAG }}
         run: |
           mkdir ~/artifact
-          cmd_str="find ./openwrt/bin/targets/ ${COLLECT_TAG} | xargs -i mv -f {} ~/artifact/"
-          echo ${cmd_str}
-          "${cmd_str[@]}"
+          findArgs=$COLLECT_TAG
+          echo ${findArgs}
+          find ./openwrt/bin/targets/ "${findArgs[@]}" | xargs -i mv -f {} ~/artifact/
+          #"${cmd_str[@]}"
           #find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
           #find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
           cp ./openwrt/.config ~/artifact/
