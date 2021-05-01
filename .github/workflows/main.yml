@@ -15,11 +15,13 @@ jobs:
       matrix:
         include:
         - PROFILE_NAME: x86_64
-          PROFILE_VERSION: v19.07.7
+          PROFILE_BRANCH: openwrt-19.07
+          PROFILE_TAG: v19.07.7
           DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
           COLLECT_TAG: ('-name' 'openwrt-x86-64*-combined.img.gz')
         #- PROFILE_NAME: ipq806x
-        #  PROFILE_VERSION: v19.07.7
+        #  PROFILE_BRANCH: openwrt-19.07
+        #  PROFILE_TAG: v19.07.7
         #  DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
         #  COLLECT_TAG: ('-name' '*factory*' '-o' '-name' '*sysupgrade*')
         
@@ -44,11 +46,11 @@ jobs:
           
       - name: Sync OpenWRT git source
         env:
-          PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
+          PROFILE_BRANCH: ${{ matrix.PROFILE_BRANCH }}
+          PROFILE_TAG: ${{ matrix.PROFILE_TAG }}
         run: |
-          git init
-          git clone -b openwrt-19.07 clone https://git.openwrt.org/openwrt/openwrt.git
-          git checkout $PROFILE_VERSION
+          git clone -b $PROFILE_BRANCH clone https://git.openwrt.org/openwrt/openwrt.git
+          git checkout $PROFILE_TAG
           
       - name: Sync addon package
         run: |
