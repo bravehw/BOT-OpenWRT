@@ -47,8 +47,7 @@ jobs:
           PROFILE_VERSION: ${{ matrix.PROFILE_VERSION }}
         run: |
           git init
-          git -b openwrt-19.07 clone https://git.openwrt.org/openwrt/openwrt.git
-          #git clone git://git.openwrt.org/openwrt/openwrt.git
+          git clone -b openwrt-19.07 clone https://git.openwrt.org/openwrt/openwrt.git
           git checkout $PROFILE_VERSION
           
       - name: Sync addon package
