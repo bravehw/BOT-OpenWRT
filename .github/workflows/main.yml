@@ -50,6 +50,7 @@ jobs:
           PROFILE_TAG: ${{ matrix.PROFILE_TAG }}
         run: |
           git clone -b $PROFILE_BRANCH https://git.openwrt.org/openwrt/openwrt.git
+          cd openwrt
           git checkout $PROFILE_TAG
           
       - name: Sync addon package
