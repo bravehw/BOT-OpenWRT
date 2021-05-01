@@ -32,7 +32,7 @@ jobs:
         run: |
           sudo -E apt-get update
           #sudo -E apt install -y libev-dev libc-ares-dev libudns-dev libncurses-dev build-essential ccache ecj fastjar file g++ gawk gettext git java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev python2 python3 unzip wget python3-distutils python3-setuptools rsync subversion swig time xsltproc zlib1g-dev
-          sudo -E apt install -y ccache gawk git libev-dev libc-ares-dev libudns-dev libncurses-dev python2 python3
+          sudo -E apt install -y ccache gawk git libev-dev libc-ares-dev libudns-dev libncurses-dev python2 python3 python-crypto python3-distutils python3-setuptools
           sudo -E apt-get -y dist-upgrade
           sudo -E apt-get clean
           
