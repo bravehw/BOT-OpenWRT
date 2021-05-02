@@ -18,12 +18,12 @@ jobs:
           PROFILE_BRANCH: openwrt-19.07
           PROFILE_TAG: v19.07.7
           DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
-          COLLECT_TAG: ('-name' 'openwrt-x86-64*-combined.img.gz')
+          COLLECT_TAG: -name "openwrt*img.gz"
         #- PROFILE_NAME: ipq806x
         #  PROFILE_BRANCH: openwrt-19.07
         #  PROFILE_TAG: v19.07.7
         #  DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
-        #  COLLECT_TAG: ('-name' '*factory*' '-o' '-name' '*sysupgrade*')
+        #  COLLECT_TAG: -name "*factory*" -o -name "*sysupgrade*"
         
     steps:
       - name: Initialization environment
@@ -101,19 +101,23 @@ jobs:
           echo -e "$(nproc) thread build."
           make -j$(nproc) V=s
           
-      - name: Collect firmware
+      - name: Collect artifact
         env:
           COLLECT_TAG: ${{ matrix.COLLECT_TAG }}
         run: |
           mkdir ~/artifact
-          findArgs=$COLLECT_TAG
-          echo ${findArgs}
-          find ./openwrt/bin/targets/ -name "*"
-          find ./openwrt/bin/targets/ "${findArgs[@]}" | xargs -i mv -f {} ~/artifact/
+          echo ${COLLECT_TAG}
+          cmd_str='find ./openwrt/bin/targets/ '$COLLECT_TAG' | xargs -i mv -f {} ~/artifact/'
+          echo $cmd_str > collect.sh
+          echo 'find ./openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} ~/artifact/' >> collect.sh
+          echo 'cp ./openwrt/.config ~/artifact/' >> tmp.sh
+          echo 'cp collect.sh ~/artifact/' >> tmp.sh
+          cat tmp.sh
+          #find ./openwrt/bin/targets/ -name "*"
+          sh ./tmp.sh
           #"${cmd_str[@]}"
           #find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
           #find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
-          cp ./openwrt/.config ~/artifact/
 
       - name: Rclone Sync
         env:
