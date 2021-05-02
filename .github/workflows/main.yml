@@ -113,7 +113,8 @@ jobs:
           echo 'cp ./openwrt/.config ~/artifact/' >> tmp.sh
           echo 'cp collect.sh ~/artifact/' >> tmp.sh
           cat tmp.sh
-          #find ./openwrt/bin/targets/ -name "*"
+          echo "======================================"
+          find ./openwrt/bin/targets/ -name "*"
           sh ./tmp.sh
           #"${cmd_str[@]}"
           #find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
