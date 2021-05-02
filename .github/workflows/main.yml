@@ -108,14 +108,16 @@ jobs:
           mkdir ~/artifact
           echo ${COLLECT_TAG}
           cmd_str='find ./openwrt/bin/targets/ '$COLLECT_TAG' | xargs -i mv -f {} ~/artifact/'
-          echo $cmd_str > collect.sh
+          echo $cmd_str >> collect.sh
           echo 'find ./openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} ~/artifact/' >> collect.sh
-          echo 'cp ./openwrt/.config ~/artifact/' >> tmp.sh
-          echo 'cp collect.sh ~/artifact/' >> tmp.sh
-          cat tmp.sh
+          echo 'cp ./openwrt/.config ~/artifact/' >> collect.sh
+          echo 'cp collect.sh ~/artifact/' >> collect.sh
+          echo "======================================"
+          cat collect.sh
           echo "======================================"
           find ./openwrt/bin/targets/ -name "*"
-          sh ./tmp.sh
+          echo "======================================"
+          sh ./collect.sh
           #"${cmd_str[@]}"
           #find ./openwrt/bin/targets/ -name "*factory*" | xargs -i mv -f {} ~/artifact/
           #find ./openwrt/bin/targets/ -name "*sysupgrade*" | xargs -i mv -f {} ~/artifact/
