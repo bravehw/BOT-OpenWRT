@@ -5,7 +5,9 @@ Using rclone to sync file from the complie vm to DAV store.
 Need to create rclone file as a secrets.RCLONE_CONF
 
 [TeraCLOUD]
+
 type = webdav
+
 url = https://seto.teracloud.jp/dav/
 
 vendor = other
