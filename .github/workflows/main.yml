@@ -20,21 +20,21 @@ jobs:
         #  DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/x86/64/config.buildinfo
         #  REMOVE_FLAG: CONFIG_TARGET
         #  DEVICE_FLAG: CONFIG_TARGET_x86=y,CONFIG_TARGET_x86_64=y,CONFIG_TARGET_x86_64_Generic=y
-        #  COLLECT_TAG: -name "openwrt*combined*img.gz"
+        #  COLLECT_FLAG: -name "openwrt*combined*img.gz"
         #- PROFILE_NAME: ipq806x
         #  PROFILE_BRANCH: openwrt-19.07
         #  PROFILE_TAG: v19.07.7
         #  DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
         #  REMOVE_FLAG: CONFIG_TARGET_DEVICE
         #  DEVICE_FLAG: CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y,CONFIG_TARGET_DEVICE_PACKAGES_ipq806x_generic_DEVICE_netgear_r7800=""
-        #  COLLECT_TAG: -name "*factory*" -o -name "*sysupgrade*"
+        #  COLLECT_FLAG: -name "*factory*" -o -name "*sysupgrade*"
         - PROFILE_NAME: ramips
           PROFILE_BRANCH: openwrt-19.07
           PROFILE_TAG: v19.07.7
           DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ramips/mt7620/config.buildinfo
           REMOVE_FLAG: CONFIG_TARGET_DEVICE
           DEVICE_FLAG: CONFIG_TARGET_DEVICE_ramips_mt7620_DEVICE_wt3020-8M=y,CONFIG_TARGET_DEVICE_PACKAGES_ramips_mt7620_DEVICE_wt3020-8M=""
-          COLLECT_TAG: -name "*factory*" -o -name "*sysupgrade*"
+          COLLECT_FLAG: -name "*factory*" -o -name "*sysupgrade*"
         
     steps:
       - name: Initialization environment
@@ -88,7 +88,7 @@ jobs:
           echo "======================================"
           cat ./.config
           echo "======================================"
-          sed -i "/${REMOVE_FLAG}/d ./.config
+          sed -i "/${REMOVE_FLAG}/d" ./.config
           cat ./.config
           echo "======================================"
           deviceArry=(${DEVICE_FLAG//,/ })
@@ -123,10 +123,10 @@ jobs:
           
       - name: Collect artifact
         env:
-          COLLECT_TAG: ${{ matrix.COLLECT_TAG }}
+          COLLECT_FLAG: ${{ matrix.COLLECT_FLAG }}
         run: |
           mkdir ~/artifact
-          cmd_str='find ./openwrt/bin/targets/ '$COLLECT_TAG' | xargs -i mv -f {} ~/artifact/'
+          cmd_str='find ./openwrt/bin/targets/ '$COLLECT_FLAG' | xargs -i mv -f {} ~/artifact/'
           echo $cmd_str >> collect.sh
           echo 'find ./openwrt/bin/targets/ -name "config.buildinfo" | xargs -i mv -f {} ~/artifact/' >> collect.sh
           echo 'cp ./openwrt/.config ~/artifact/' >> collect.sh
