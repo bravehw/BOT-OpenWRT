@@ -127,6 +127,10 @@ jobs:
           CONFIG_PACKAGE_luci-app-ddns=y
           CONFIG_PACKAGE_luci-app-upnp=y
           CONFIG_PACKAGE_luci-ssl=y
+          CONFIG_PACKAGE_kmod-usb-net-rndis=y
+          CONFIG_PACKAGE_kmod-usb-net=y
+          CONFIG_PACKAGE_usb-modeswitch=y
+          CONFIG_PACKAGE_kmod-usb-net-cdc-ether=y
           EOF
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
