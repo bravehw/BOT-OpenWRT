@@ -121,6 +121,9 @@ jobs:
       - name: Add additional package to configuration file
         run: |
           cd openwrt
+          # replace dnsmasq with dnsmasq-full
+          # sed -i '/CONFIG_PACKAGE_dnsmasq=y/d' ./.config
+          
           cat >> ./.config <<EOF
           CONFIG_PACKAGE_vlmcsd=y
           CONFIG_PACKAGE_luci-app-vlmcsd=y
@@ -129,9 +132,12 @@ jobs:
           CONFIG_PACKAGE_luci-ssl=y
           CONFIG_PACKAGE_kmod-usb-net-rndis=y
           CONFIG_PACKAGE_kmod-usb-net=y
+          CONFIG_PACKAGE_kmod-usb2=y
           CONFIG_PACKAGE_usb-modeswitch=y
           CONFIG_PACKAGE_kmod-usb-net-cdc-ether=y
+          CONFIG_PACKAGE_block-mount=y
           EOF
+          
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
           
