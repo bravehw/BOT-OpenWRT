@@ -21,19 +21,26 @@ jobs:
         #  REMOVE_FLAG: CONFIG_TARGET,CONFIG_TARGET_ALL_PROFILES
         #  DEVICE_FLAG: CONFIG_TARGET_x86=y,CONFIG_TARGET_x86_64=y,CONFIG_TARGET_x86_64_Generic=y
         #  COLLECT_FLAG: -name "openwrt*combined*img.gz"
-        - PROFILE_NAME: ipq806x
-          PROFILE_BRANCH: openwrt-19.07
-          PROFILE_TAG: v19.07.7
-          DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
+        #- PROFILE_NAME: ipq806x
+        #  PROFILE_BRANCH: openwrt-19.07
+        #  PROFILE_TAG: v19.07.7
+        #  DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ipq806x/generic/config.buildinfo
+        #  REMOVE_FLAG: CONFIG_TARGET_DEVICE,CONFIG_TARGET_ALL_PROFILES
+        #  DEVICE_FLAG: CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y,CONFIG_TARGET_DEVICE_PACKAGES_ipq806x_generic_DEVICE_netgear_r7800=""
+        #  COLLECT_FLAG: -name "*factory*" -o -name "*sysupgrade*"
+        #- PROFILE_NAME: ramips
+        #  PROFILE_BRANCH: openwrt-19.07
+        #  PROFILE_TAG: v19.07.7
+        #  DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ramips/mt7620/config.buildinfo
+        #  REMOVE_FLAG: CONFIG_TARGET_DEVICE,CONFIG_TARGET_ALL_PROFILES
+        #  DEVICE_FLAG: CONFIG_TARGET_DEVICE_ramips_mt7620_DEVICE_wt3020-8M=y,CONFIG_TARGET_DEVICE_PACKAGES_ramips_mt7620_DEVICE_wt3020-8M=""
+        #  COLLECT_FLAG: -name "*factory*" -o -name "*sysupgrade*"
+        - PROFILE_NAME: mediatek
+          PROFILE_BRANCH: openwrt-23.05
+          PROFILE_TAG: v23.05.2
+          DEFAULT_PROFILE: https://downloads.openwrt.org/releases/23.05.2/targets/mediatek/filogic/config.buildinfo
           REMOVE_FLAG: CONFIG_TARGET_DEVICE,CONFIG_TARGET_ALL_PROFILES
-          DEVICE_FLAG: CONFIG_TARGET_DEVICE_ipq806x_generic_DEVICE_netgear_r7800=y,CONFIG_TARGET_DEVICE_PACKAGES_ipq806x_generic_DEVICE_netgear_r7800=""
-          COLLECT_FLAG: -name "*factory*" -o -name "*sysupgrade*"
-        - PROFILE_NAME: ramips
-          PROFILE_BRANCH: openwrt-19.07
-          PROFILE_TAG: v19.07.7
-          DEFAULT_PROFILE: https://downloads.openwrt.org/releases/19.07.7/targets/ramips/mt7620/config.buildinfo
-          REMOVE_FLAG: CONFIG_TARGET_DEVICE,CONFIG_TARGET_ALL_PROFILES
-          DEVICE_FLAG: CONFIG_TARGET_DEVICE_ramips_mt7620_DEVICE_wt3020-8M=y,CONFIG_TARGET_DEVICE_PACKAGES_ramips_mt7620_DEVICE_wt3020-8M=""
+          DEVICE_FLAG: CONFIG_TARGET_DEVICE_mediatek_filogic_DEVICE_xiaomi_redmi-router-ax6000-ubootmod=y,CONFIG_TARGET_DEVICE_PACKAGES_mediatek_filogic_DEVICE_xiaomi_redmi-router-ax6000-ubootmod=""
           COLLECT_FLAG: -name "*factory*" -o -name "*sysupgrade*"
         
     steps:
